@@ -1,0 +1,111 @@
+{
+  "name": "b2c-auto-update",
+  "displayName": "b2c-auto-update",
+  "description": "",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "1.95.3"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:dependencyUpdaterView"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [{
+        "id": "dependency-updater",
+        "title": "依赖更新工具",
+        "icon": "resources/dependency.svg"
+      }]
+    },
+    "views": {
+      "dependency-updater": [
+        {
+          "id": "packageInputView",
+          "name": "包信息",
+          "type": "tree"
+        },
+        {
+          "id": "dependencyUpdaterView",
+          "name": "项目列表",
+          "type": "tree",
+          "contextualTitle": "依赖更新工具"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "dependency-updater.selectFolder",
+        "title": "选择项目文件夹",
+        "icon": "$(add)"
+      },
+      {
+        "command": "dependency-updater.clearProjects",
+        "title": "清空项目列表",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "dependency-updater.addPackage",
+        "title": "添加包",
+        "icon": "$(add)"
+      },
+      {
+        "command": "dependency-updater.editPackage",
+        "title": "编辑",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "dependency-updater.deletePackage",
+        "title": "删除",
+        "icon": "$(trash)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "dependency-updater.selectFolder",
+          "when": "view == dependencyUpdaterView",
+          "group": "navigation"
+        },
+        {
+          "command": "dependency-updater.clearProjects",
+          "when": "view == dependencyUpdaterView",
+          "group": "navigation"
+        },
+        {
+          "command": "dependency-updater.addPackage",
+          "when": "view == packageInputView",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "dependency-updater.editPackage",
+          "when": "view == packageInputView && viewItem == package",
+          "group": "inline"
+        },
+        {
+          "command": "dependency-updater.deletePackage",
+          "when": "view == packageInputView && viewItem == package",
+          "group": "inline"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.96.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "eslint": "^9.16.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1"
+  }
+}
