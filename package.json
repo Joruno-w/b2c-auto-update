@@ -3,6 +3,7 @@
   "displayName": "b2c-auto-update",
   "description": "自动更新依赖工具",
   "version": "0.0.1",
+  "publisher": "Joruno-w",
   "license": "MIT",
   "repository": {
     "type": "git",
