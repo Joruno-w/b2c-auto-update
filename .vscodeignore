@@ -3,10 +3,15 @@
 test/**
 .gitignore
 .yarnrc
-vsc-extension-quickstart.md
-**/jsconfig.json
+webpack.config.js
+node_modules/**
+src/**
+extension.js
 **/*.map
-**/eslint.config.mjs
-**/.vscode-test.*
-# 确保不忽略资源文件
+**/*.ts
+.git/**
+.github/**
+out/**
+# 只保留编译后的文件和必要资源
+!dist/**
 !resources/**
