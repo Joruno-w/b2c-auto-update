@@ -1,8 +1,12 @@
 {
   "name": "b2c-auto-update",
   "displayName": "b2c-auto-update",
-  "description": "",
+  "description": "自动更新依赖工具",
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Joruno-w/b2c-auto-update"
+  },
   "engines": {
     "vscode": "^1.95.3"
   },
