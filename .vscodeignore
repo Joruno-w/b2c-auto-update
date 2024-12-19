@@ -8,3 +8,5 @@ vsc-extension-quickstart.md
 **/*.map
 **/eslint.config.mjs
 **/.vscode-test.*
+# 确保不忽略资源文件
+!resources/**

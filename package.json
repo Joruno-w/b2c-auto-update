@@ -4,22 +4,30 @@
   "description": "",
   "version": "0.0.1",
   "engines": {
-    "vscode": "1.95.3"
+    "vscode": "^1.95.3"
   },
   "categories": [
     "Other"
   ],
   "activationEvents": [
-    "onView:dependencyUpdaterView"
+    "onView:dependencyUpdaterView",
+    "onView:packageInputView",
+    "onCommand:dependency-updater.addPackage",
+    "onCommand:dependency-updater.editPackage",
+    "onCommand:dependency-updater.deletePackage",
+    "onCommand:dependency-updater.clearPackages",
+    "onCommand:dependency-updater.updateDependencies"
   ],
   "main": "./extension.js",
   "contributes": {
     "viewsContainers": {
-      "activitybar": [{
-        "id": "dependency-updater",
-        "title": "依赖更新工具",
-        "icon": "resources/dependency.svg"
-      }]
+      "activitybar": [
+        {
+          "id": "dependency-updater",
+          "title": "依赖更新工具",
+          "icon": "resources/dependency.svg"
+        }
+      ]
     },
     "views": {
       "dependency-updater": [
@@ -36,17 +44,24 @@
         }
       ]
     },
+    "viewsWelcome": [
+      {
+        "view": "dependencyUpdaterView",
+        "contents": "[更新依赖$(arrow-right)](command:dependency-updater.updateDependencies)\n使用依赖更新工具更新所选项目。",
+        "when": "true"
+      },
+      {
+        "view": "dependencyUpdaterView",
+        "contents": "暂无选中项目。\n[选择文件夹](command:dependency-updater.selectFolder)",
+        "when": "!dependency-updater.hasProjects"
+      },
+      {
+        "view": "dependencyUpdaterView",
+        "contents": "[$(sync) 更新所选依赖](command:dependency-updater.updateDependencies)",
+        "when": "dependency-updater:hasProjects"
+      }
+    ],
     "commands": [
-      {
-        "command": "dependency-updater.selectFolder",
-        "title": "选择项目文件夹",
-        "icon": "$(add)"
-      },
-      {
-        "command": "dependency-updater.clearProjects",
-        "title": "清空项目列表",
-        "icon": "$(clear-all)"
-      },
       {
         "command": "dependency-updater.addPackage",
         "title": "添加包",
@@ -61,51 +76,63 @@
         "command": "dependency-updater.deletePackage",
         "title": "删除",
         "icon": "$(trash)"
+      },
+      {
+        "command": "dependency-updater.clearPackages",
+        "title": "清空包列表",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "dependency-updater.selectFolder",
+        "title": "选择项目文件夹",
+        "icon": "$(add)"
+      },
+      {
+        "command": "dependency-updater.clearProjects",
+        "title": "清空项目列表",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "dependency-updater.updateDependencies",
+        "title": "更新依赖",
+        "icon": "$(sync)"
       }
     ],
     "menus": {
       "view/title": [
         {
+          "command": "dependency-updater.addPackage",
+          "when": "view == packageInputView",
+          "group": "navigation@1"
+        },
+        {
+          "command": "dependency-updater.clearPackages",
+          "when": "view == packageInputView",
+          "group": "navigation@2"
+        },
+        {
           "command": "dependency-updater.selectFolder",
           "when": "view == dependencyUpdaterView",
-          "group": "navigation"
+          "group": "navigation@1"
         },
         {
           "command": "dependency-updater.clearProjects",
           "when": "view == dependencyUpdaterView",
-          "group": "navigation"
-        },
-        {
-          "command": "dependency-updater.addPackage",
-          "when": "view == packageInputView",
-          "group": "navigation"
+          "group": "navigation@2"
         }
       ],
       "view/item/context": [
         {
           "command": "dependency-updater.editPackage",
-          "when": "view == packageInputView && viewItem == package",
+          "when": "view == packageInputView",
           "group": "inline"
         },
         {
           "command": "dependency-updater.deletePackage",
-          "when": "view == packageInputView && viewItem == package",
+          "when": "view == packageInputView",
           "group": "inline"
         }
       ]
     }
-  },
-  "scripts": {
-    "lint": "eslint .",
-    "pretest": "npm run lint",
-    "test": "vscode-test"
-  },
-  "devDependencies": {
-    "@types/vscode": "^1.96.0",
-    "@types/mocha": "^10.0.10",
-    "@types/node": "20.x",
-    "eslint": "^9.16.0",
-    "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1"
   }
 }
