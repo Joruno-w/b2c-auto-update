@@ -188,6 +188,24 @@ class PackageInputProvider {
     }
 }
 
+async function updateProjectDependencies(projectPath, packages) {
+    try {
+        // 执行 npm install
+        const packagesStr = packages.join(' ');
+        console.log(`Updating ${projectPath} with packages: ${packagesStr}`);
+        await exec(`npm i ${packagesStr}`, { cwd: projectPath });
+
+        // Git 操作
+        await exec('git add .', { cwd: projectPath });
+        await exec('git commit -m "feat: 更新依赖"', { cwd: projectPath });
+        await exec('git push', { cwd: projectPath });
+
+        return true;
+    } catch (error) {
+        throw new Error(`更新失败: ${error.message}`);
+    }
+}
+
 async function activate(context) {
     const provider = new DependencyUpdaterProvider();
     const inputProvider = new PackageInputProvider();
@@ -271,17 +289,50 @@ async function activate(context) {
             // 显示更新进度
             return vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
-                title: "更新依赖",
+                title: "批量更新依赖",
                 cancellable: false
             }, async (progress) => {
                 try {
-                    progress.report({ message: "正在更新..." });
+                    const total = selectedProjects.length;
+                    for (let i = 0; i < total; i++) {
+                        const project = selectedProjects[i];
+                        progress.report({ 
+                            message: `正在更新 ${project.projectName} (${i + 1}/${total})`,
+                            increment: (100 / total)
+                        });
+                        
+                        await updateProjectDependencies(project.path, packages);
+                    }
                     
-                    // TODO: 实现依赖更新逻辑
-                    
-                    vscode.window.showInformationMessage('依赖更新完成');
+                    vscode.window.showInformationMessage(`成功更新 ${total} 个项目`);
                 } catch (error) {
-                    vscode.window.showErrorMessage(`更新失败: ${error.message}`);
+                    vscode.window.showErrorMessage(`批量更新失败: ${error.message}`);
+                }
+            });
+        }),
+
+        vscode.commands.registerCommand('dependency-updater.updateProject', async (item) => {
+            if (!(item instanceof ProjectItem)) {
+                return;
+            }
+
+            const packages = inputProvider.packages;
+            if (!packages.length) {
+                vscode.window.showInformationMessage('请先添加要更新的包');
+                return;
+            }
+
+            return vscode.window.withProgress({
+                location: vscode.ProgressLocation.Notification,
+                title: `正在更新项目: ${item.projectName}`,
+                cancellable: false
+            }, async (progress) => {
+                try {
+                    progress.report({ message: "正在执行更新..." });
+                    await updateProjectDependencies(item.path, packages);
+                    vscode.window.showInformationMessage(`项目 ${item.projectName} 更新完成`);
+                } catch (error) {
+                    vscode.window.showErrorMessage(error.message);
                 }
             });
         })

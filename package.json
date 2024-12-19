@@ -96,6 +96,11 @@
         "command": "dependency-updater.updateDependencies",
         "title": "更新依赖",
         "icon": "$(sync)"
+      },
+      {
+        "command": "dependency-updater.updateProject",
+        "title": "更新此项目",
+        "icon": "$(sync)"
       }
     ],
     "menus": {
@@ -119,6 +124,11 @@
           "command": "dependency-updater.clearProjects",
           "when": "view == dependencyUpdaterView",
           "group": "navigation@2"
+        },
+        {
+          "command": "dependency-updater.updateDependencies",
+          "when": "view == dependencyUpdaterView",
+          "group": "navigation@3"
         }
       ],
       "view/item/context": [
@@ -130,6 +140,11 @@
         {
           "command": "dependency-updater.deletePackage",
           "when": "view == packageInputView",
+          "group": "inline"
+        },
+        {
+          "command": "dependency-updater.updateProject",
+          "when": "view == dependencyUpdaterView",
           "group": "inline"
         }
       ]
