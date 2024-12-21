@@ -31,8 +31,9 @@
     "webpack-dev": "webpack --mode development --watch"
   },
   "devDependencies": {
-    "webpack": "^5.97.1",
-    "webpack-cli": "^5.1.4"
+    "webpack": "5.97.0",
+    "webpack-cli": "^5.1.4",
+    "tsup": "8.2.4"
   },
   "contributes": {
     "viewsContainers": {
@@ -62,18 +63,8 @@
     "viewsWelcome": [
       {
         "view": "dependencyUpdaterView",
-        "contents": "[更新依赖$(arrow-right)](command:dependency-updater.updateDependencies)\n使用依赖更新工具更新所选项目。",
-        "when": "true"
-      },
-      {
-        "view": "dependencyUpdaterView",
         "contents": "暂无选中项目。\n[选择文件夹](command:dependency-updater.selectFolder)",
         "when": "!dependency-updater.hasProjects"
-      },
-      {
-        "view": "dependencyUpdaterView",
-        "contents": "[$(sync) 更新所选依赖](command:dependency-updater.updateDependencies)",
-        "when": "dependency-updater:hasProjects"
       }
     ],
     "commands": [

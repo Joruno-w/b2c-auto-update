@@ -54,18 +54,34 @@ async function updateDependency(projectPath, packageName, version) {
     fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
 }
 
-async function updateProjectDependencies(projectPath, packages) {
+async function updateProjectDependencies(projectPath, packages, token) {
     try {
+        // 检查是否已取消
+        if (token.isCancellationRequested) {
+            throw new Error('操作已取消');
+        }
+
         // 切换 Node 版本
         await switchNodeVersion(projectPath);
+
+        if (token.isCancellationRequested) {
+            throw new Error('操作已取消');
+        }
 
         // 获取包管理器
         const packageManager = await getPackageManager(projectPath);
         
         // 更新 package.json 中的版本
         for (const pkg of packages) {
+            if (token.isCancellationRequested) {
+                throw new Error('操作已取消');
+            }
             const [name, version] = pkg.split('@').filter(Boolean);
             await updateDependency(projectPath, name, version);
+        }
+
+        if (token.isCancellationRequested) {
+            throw new Error('操作已取消');
         }
 
         // 执行安装
@@ -77,6 +93,10 @@ async function updateProjectDependencies(projectPath, packages) {
 
         await exec(installCmd, { cwd: projectPath });
 
+        if (token.isCancellationRequested) {
+            throw new Error('操作已取消');
+        }
+
         // Git 操作
         await exec('git add .', { cwd: projectPath });
         await exec('git commit -m "feat: 更新依赖"', { cwd: projectPath });
@@ -84,6 +104,9 @@ async function updateProjectDependencies(projectPath, packages) {
 
         return true;
     } catch (error) {
+        if (error.message === '操作已取消') {
+            throw error;
+        }
         throw new Error(`更新失败: ${error.message}`);
     }
 }
@@ -356,23 +379,32 @@ async function activate(context) {
             return vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
                 title: "批量更新依赖",
-                cancellable: false
-            }, async (progress) => {
+                cancellable: true  // 启用取消功能
+            }, async (progress, token) => {
                 try {
                     const total = selectedProjects.length;
                     for (let i = 0; i < total; i++) {
+                        if (token.isCancellationRequested) {
+                            vscode.window.showInformationMessage('已取消更新操作');
+                            return;
+                        }
+
                         const project = selectedProjects[i];
                         progress.report({ 
-                            message: `正在更新 ${project.projectName} (${i + 1}/${total})`,
+                            message: `正在更新「${project.projectName}」(${i + 1}/${total})`,
                             increment: (100 / total)
                         });
                         
-                        await updateProjectDependencies(project.path, packages);
+                        await updateProjectDependencies(project.path, packages, token);
                     }
                     
                     vscode.window.showInformationMessage(`成功更新 ${total} 个项目`);
                 } catch (error) {
-                    vscode.window.showErrorMessage(`批量更新失败: ${error.message}`);
+                    if (error.message === '操作已取消') {
+                        vscode.window.showInformationMessage('已取消更新操作');
+                    } else {
+                        vscode.window.showErrorMessage(`批量更新失败: ${error.message}`);
+                    }
                 }
             });
         }),
@@ -390,15 +422,18 @@ async function activate(context) {
 
             return vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
-                title: `正在更新项目: ${item.projectName}`,
-                cancellable: false
-            }, async (progress) => {
+                title: `正在更新项目「${item.projectName}」`,
+                cancellable: true  // 启用取消功能
+            }, async (progress, token) => {
                 try {
-                    progress.report({ message: "正在执行更新..." });
-                    await updateProjectDependencies(item.path, packages);
-                    vscode.window.showInformationMessage(`项目 ${item.projectName} 更新完成`);
+                    await updateProjectDependencies(item.path, packages, token);
+                    vscode.window.showInformationMessage(`项目「${item.projectName}」更新完成`);
                 } catch (error) {
-                    vscode.window.showErrorMessage(error.message);
+                    if (error.message === '操作已取消') {
+                        vscode.window.showInformationMessage('已取消更新操作');
+                    } else {
+                        vscode.window.showErrorMessage(error.message);
+                    }
                 }
             });
         })
