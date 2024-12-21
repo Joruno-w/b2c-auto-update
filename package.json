@@ -33,7 +33,9 @@
   "devDependencies": {
     "webpack": "5.97.1",
     "webpack-cli": "^5.1.4",
-    "tsup": "8.2.4"
+    "vscode:prepublish": "nr build",
+    "publish": "vsce publish --no-dependencies",
+    "pack": "vsce package --no-dependencies"
   },
   "contributes": {
     "viewsContainers": {
