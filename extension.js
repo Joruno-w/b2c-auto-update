@@ -4,6 +4,90 @@ const path = require('path');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
+// 获取包管理器类型
+async function getPackageManager(projectPath) {
+    const lockFiles = {
+        'package-lock.json': 'npm',
+        'yarn.lock': 'yarn',
+        'pnpm-lock.yaml': 'pnpm'
+    };
+
+    for (const [file, manager] of Object.entries(lockFiles)) {
+        if (fs.existsSync(path.join(projectPath, file))) {
+            return manager;
+        }
+    }
+    return 'npm'; // 默认使用 npm
+}
+
+// 检查并切换 Node 版本
+async function switchNodeVersion(projectPath) {
+    try {
+        const nvmrcPath = path.join(projectPath, '.nvmrc');
+        if (fs.existsSync(nvmrcPath)) {
+            const requiredVersion = fs.readFileSync(nvmrcPath, 'utf8').trim();
+            const currentVersion = (await exec('node -v')).stdout.trim();
+            
+            const requiredMajor = requiredVersion.match(/v?(\d+)/)[1];
+            const currentMajor = currentVersion.match(/v?(\d+)/)[1];
+
+            if (requiredMajor !== currentMajor) {
+                await exec(`nvm use ${requiredVersion}`);
+            }
+        }
+    } catch (error) {
+        throw new Error(`Node版本切换失败: ${error.message}`);
+    }
+}
+
+async function updateDependency(projectPath, packageName, version) {
+    const packageJsonPath = path.join(projectPath, 'package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+    
+    // 更新依赖版本
+    if (packageJson.dependencies && packageJson.dependencies[packageName]) {
+        packageJson.dependencies[packageName] = version;
+    } else if (packageJson.devDependencies && packageJson.devDependencies[packageName]) {
+        packageJson.devDependencies[packageName] = version;
+    }
+
+    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+}
+
+async function updateProjectDependencies(projectPath, packages) {
+    try {
+        // 切换 Node 版本
+        await switchNodeVersion(projectPath);
+
+        // 获取包管理器
+        const packageManager = await getPackageManager(projectPath);
+        
+        // 更新 package.json 中的版本
+        for (const pkg of packages) {
+            const [name, version] = pkg.split('@').filter(Boolean);
+            await updateDependency(projectPath, name, version);
+        }
+
+        // 执行安装
+        const installCmd = {
+            npm: 'npm install',
+            yarn: 'yarn install',
+            pnpm: 'pnpm install'
+        }[packageManager];
+
+        await exec(installCmd, { cwd: projectPath });
+
+        // Git 操作
+        await exec('git add .', { cwd: projectPath });
+        await exec('git commit -m "feat: 更新依赖"', { cwd: projectPath });
+        await exec('git push', { cwd: projectPath });
+
+        return true;
+    } catch (error) {
+        throw new Error(`更新失败: ${error.message}`);
+    }
+}
+
 async function getGitBranch(projectPath) {
     try {
         const { stdout } = await exec('git rev-parse --abbrev-ref HEAD', {
@@ -42,22 +126,22 @@ class ProjectItem extends vscode.TreeItem {
             this.label = this.projectName;
             this.description = `on ${branch}`;
             
-            // 如果选中，设置颜色和高亮样式
+            // 分支名用绿色
             if (this.selected) {
-                // 自定义颜色效果
                 this.resourceUri = vscode.Uri.parse(`project-selected:${this.projectName}`);
-                this.iconPath = new vscode.ThemeIcon('check', new vscode.ThemeColor('charts.green'));
+                this.iconPath = new vscode.ThemeIcon('check', new vscode.ThemeColor('gitDecoration.addedResourceForeground'));
             } else {
-                // 设置工程名和分支名的颜色
                 this.resourceUri = vscode.Uri.parse(`project:${this.projectName}`);
             }
         } else {
+            // 文件名用红色
             this.iconPath = new vscode.ThemeIcon(this.selected ? 'check' : 'folder');
             this.label = this.projectName;
+            this.description = '';
             
             if (this.selected) {
                 this.resourceUri = vscode.Uri.parse(`project-selected:${this.projectName}`);
-                this.iconPath = new vscode.ThemeIcon('check', new vscode.ThemeColor('charts.green'));
+                this.iconPath = new vscode.ThemeIcon('check', new vscode.ThemeColor('gitDecoration.deletedResourceForeground'));
             }
         }
         
@@ -185,24 +269,6 @@ class PackageInputProvider {
     clearPackages() {
         this.packages = [];
         this._onDidChangeTreeData.fire();
-    }
-}
-
-async function updateProjectDependencies(projectPath, packages) {
-    try {
-        // 执行 npm install
-        const packagesStr = packages.join(' ');
-        console.log(`Updating ${projectPath} with packages: ${packagesStr}`);
-        await exec(`npm i ${packagesStr}`, { cwd: projectPath });
-
-        // Git 操作
-        await exec('git add .', { cwd: projectPath });
-        await exec('git commit -m "feat: 更新依赖"', { cwd: projectPath });
-        await exec('git push', { cwd: projectPath });
-
-        return true;
-    } catch (error) {
-        throw new Error(`更新失败: ${error.message}`);
     }
 }
 
@@ -355,34 +421,6 @@ async function activate(context) {
 
     // 初始化上下文状态
     await vscode.commands.executeCommand('setContext', 'dependency-updater:hasProjects', false);
-    
-    // 设置欢迎页面样式
-    const config = vscode.workspace.getConfiguration('workbench');
-    await config.update('welcomePage.buttonBackground', '#0098FF', vscode.ConfigurationTarget.Global);
-    await config.update('welcomePage.buttonHoverBackground', '#0070BE', vscode.ConfigurationTarget.Global);
-    
-    // 添加颜色装饰器配置
-    const workbenchConfig = vscode.workspace.getConfiguration('workbench');
-    const colorCustomizations = {
-        'workbench.colorCustomizations': {
-            'list.activeSelectionForeground': '#5DAAB5',
-            'list.inactiveSelectionForeground': '#5DAAB5',
-            'gitDecoration.modifiedResourceForeground': '#D9739F',
-            'charts.green': '#4EC9B0'
-        }
-    };
-
-    // 更新颜色配置
-    workbenchConfig.update(
-        'colorCustomizations',
-        colorCustomizations['workbench.colorCustomizations'],
-        vscode.ConfigurationTarget.Global
-    );
-
-    // 更新颜色配置后添加更新按钮样式
-    const buttonStyles = vscode.workspace.getConfiguration('workbench');
-    buttonStyles.update('welcomePage.buttonBackground', '#0098FF', vscode.ConfigurationTarget.Global);
-    buttonStyles.update('welcomePage.buttonHoverBackground', '#0070BE', vscode.ConfigurationTarget.Global);
 }
 
 module.exports = {

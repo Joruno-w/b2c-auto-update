@@ -1,7 +1,7 @@
 {
-  "name": "b2c-auto-update",
-  "displayName": "b2c-auto-update",
-  "description": "自动更新依赖工具",
+  "name": "dependency-updater",
+  "displayName": "Dependency Updater",
+  "description": "批量更新项目依赖",
   "version": "0.0.1",
   "publisher": "Joruno-w",
   "license": "MIT",
@@ -10,7 +10,7 @@
     "url": "https://github.com/Joruno-w/b2c-auto-update"
   },
   "engines": {
-    "vscode": "^1.95.3"
+    "vscode": "^1.60.0"
   },
   "categories": [
     "Other"
@@ -24,7 +24,7 @@
     "onCommand:dependency-updater.clearPackages",
     "onCommand:dependency-updater.updateDependencies"
   ],
-  "main": "./dist/extension.js",
+  "main": "./extension.js",
   "scripts": {
     "vscode:prepublish": "webpack --mode production",
     "webpack": "webpack --mode development",
@@ -39,8 +39,8 @@
       "activitybar": [
         {
           "id": "dependency-updater",
-          "title": "依赖更新工具",
-          "icon": "resources/dependency.svg"
+          "title": "依赖更新器",
+          "icon": "$(package)"
         }
       ]
     },
