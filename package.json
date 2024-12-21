@@ -2,7 +2,7 @@
   "name": "dependency-updater",
   "displayName": "Dependency Updater",
   "description": "批量更新项目依赖",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "Joruno-w",
   "icon": "resources/icon.png",
   "license": "MIT",
@@ -16,24 +16,18 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onView:dependencyUpdaterView",
-    "onView:packageInputView",
-    "onCommand:dependency-updater.addPackage",
-    "onCommand:dependency-updater.editPackage",
-    "onCommand:dependency-updater.deletePackage",
-    "onCommand:dependency-updater.clearPackages",
-    "onCommand:dependency-updater.updateDependencies"
-  ],
+  "activationEvents": [],
   "main": "./dist/extension.js",
   "scripts": {
     "vscode:prepublish": "webpack --mode production",
     "build": "webpack --mode production",
     "watch": "webpack --mode development --watch",
-    "pack": "npm run build && vsce package --no-dependencies",
-    "pub": "vsce publish --no-dependencies"
+    "pack": "nr build && vsce package --no-dependencies",
+    "pub": "vsce publish --no-dependencies",
+    "release": "bumpp && nr publish"
   },
   "devDependencies": {
+    "bumpp": "^9.9.1",
     "webpack": "5.97.1",
     "webpack-cli": "^5.1.4"
   },
