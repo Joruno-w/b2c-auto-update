@@ -29,7 +29,7 @@
     "vscode:prepublish": "webpack --mode production",
     "webpack": "webpack --mode development",
     "webpack-dev": "webpack --mode development --watch",
-     "publish": "vsce publish --no-dependencies",
+    "publish": "vsce publish --no-dependencies",
     "pack": "vsce package --no-dependencies"
   },
   "devDependencies": {
