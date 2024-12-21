@@ -4,6 +4,7 @@
   "description": "批量更新项目依赖",
   "version": "0.0.1",
   "publisher": "Joruno-w",
+  "icon": "resources/icon.png",
   "license": "MIT",
   "repository": {
     "type": "git",
