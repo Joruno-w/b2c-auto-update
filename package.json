@@ -30,8 +30,8 @@
     "vscode:prepublish": "webpack --mode production",
     "build": "webpack --mode production",
     "watch": "webpack --mode development --watch",
-    "package": "npm run build && vsce package --no-dependencies",
-    "publish": "vsce publish --no-dependencies"
+    "pack": "npm run build && vsce package --no-dependencies",
+    "pub": "vsce publish --no-dependencies"
   },
   "devDependencies": {
     "webpack": "5.97.1",
