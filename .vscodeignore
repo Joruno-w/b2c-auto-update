@@ -3,15 +3,14 @@
 test/**
 .gitignore
 .yarnrc
-webpack.config.js
-node_modules/**
 src/**
-extension.js
 **/*.map
 **/*.ts
 .git/**
 .github/**
 out/**
-# 只保留编译后的文件和必要资源
+
+# 不要忽略这些文件
 !dist/**
-!resources/**
+!extension.js
+!webpack.config.js

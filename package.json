@@ -24,13 +24,13 @@
     "onCommand:dependency-updater.clearPackages",
     "onCommand:dependency-updater.updateDependencies"
   ],
-  "main": "./extension.js",
+  "main": "./dist/extension.js",
   "scripts": {
     "vscode:prepublish": "webpack --mode production",
-    "webpack": "webpack --mode development",
-    "webpack-dev": "webpack --mode development --watch",
-    "publish": "vsce publish --no-dependencies",
-    "pack": "vsce package --no-dependencies"
+    "build": "webpack --mode production",
+    "watch": "webpack --mode development --watch",
+    "package": "npm run build && vsce package --no-dependencies",
+    "publish": "vsce publish --no-dependencies"
   },
   "devDependencies": {
     "webpack": "5.97.1",
