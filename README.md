@@ -7,8 +7,7 @@
 <p align="center">这是一个自动更新依赖包的 VSCode 插件。</p>
 
 <p align="center">
-<a href="https://marketplace.visualstudio.com/items?itemName=Joruno-w.dependency-updater" target="__blank"><img src="https://img.shields.io/visual-studio-marketplace/v/Joruno-w.dependency-updater?color=c19999&amp;label=Marketplace&logo=visual-studio-code
-" alt="Visual Studio Marketplace Version" /></a>
+<a href="https://marketplace.visualstudio.com/items?itemName=Joruno-w.dependency-updater" target="__blank"><img src="https://img.shields.io/visual-studio-marketplace/v/Joruno-w.dependency-updater?color=c19999&amp;label=Marketplace&logo=visual-studio-code" alt="Visual Studio Marketplace Version" /></a>
 </p>
 
 ## 安装步骤
