@@ -24,7 +24,7 @@
     "watch": "webpack --mode development --watch",
     "pack": "nr build && vsce package --no-dependencies",
     "pub": "vsce publish --no-dependencies",
-    "release": "bumpp && nr publish"
+    "release": "bumpp && npm run pub"
   },
   "devDependencies": {
     "bumpp": "^9.9.1",
