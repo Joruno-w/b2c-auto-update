@@ -32,11 +32,46 @@ async function switchNodeVersion(projectPath) {
             const currentMajor = currentVersion.match(/v?(\d+)/)[1];
 
             if (requiredMajor !== currentMajor) {
-                await exec(`nvm use ${requiredVersion}`);
+                // 获取环境变量
+                const home = process.env.HOME || process.env.USERPROFILE;
+                const nvmScript = path.join(home, '.nvm/nvm.sh');
+                const bashProfile = path.join(home, '.bash_profile');
+                const zshrc = path.join(home, '.zshrc');
+
+                let shell = '/bin/bash';
+                let initScript = '';
+
+                // 检查并加载 shell 配置文件
+                if (fs.existsSync(zshrc)) {
+                    shell = '/bin/zsh';
+                    initScript = `source ${zshrc} && `;
+                } else if (fs.existsSync(bashProfile)) {
+                    initScript = `source ${bashProfile} && `;
+                }
+
+                if (fs.existsSync(nvmScript)) {
+                    // 构建完整的命令
+                    const cmd = `${initScript}source "${nvmScript}" && nvm use ${requiredMajor} && export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"`;
+                    
+                    // 执行命令并获取新的 node 路径
+                    const { stdout: nvmOutput } = await exec(cmd, { shell });
+                    console.log('nvm output:', nvmOutput);
+
+                    // 更新当前进程的 PATH
+                    const { stdout: nodePath } = await exec('which node', { shell });
+                    const nodeDir = path.dirname(nodePath.trim());
+                    process.env.PATH = `${nodeDir}:${process.env.PATH}`;
+
+                    // 验证版本切换
+                    const { stdout: newVersion } = await exec('node -v');
+                    console.log(`Node version switched to: ${newVersion.trim()}`);
+                } else {
+                    console.warn('未找到 nvm 安装，跳过 Node 版本切换');
+                }
             }
         }
     } catch (error) {
-        throw new Error(`Node版本切换失败: ${error.message}`);
+        console.warn(`Node版本切换失败 (非致命错误): ${error.message}`);
     }
 }
 
