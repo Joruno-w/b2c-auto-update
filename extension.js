@@ -7,9 +7,9 @@ const exec = util.promisify(require('child_process').exec);
 // 获取包管理器类型
 async function getPackageManager(projectPath) {
     const lockFiles = {
-        'package-lock.json': 'npm',
+        'pnpm-lock.yaml': 'pnpm',
         'yarn.lock': 'yarn',
-        'pnpm-lock.yaml': 'pnpm'
+        'package-lock.json': 'npm',
     };
 
     for (const [file, manager] of Object.entries(lockFiles)) {
