@@ -1,51 +1,33 @@
-# B2C Auto Update VSCode Extension
+<p align="center">
+<img src="https://github.com/user-attachments/assets/408433d9-fa1a-4f71-a967-49a66581124b" height="130" width="130"/>
+</p>
 
-A Visual Studio Code extension that automatically updates B2C related files and configurations.
+<h1 align="center">Dependency Updater</h1>
 
-## Features
+<p align="center">这是一个自动更新依赖包的 VSCode 插件。</p>
 
-- Automatic update of B2C configuration files
-- Real-time synchronization of changes
-- Easy-to-use interface
+<p align="center">
+<a href="https://marketplace.visualstudio.com/items?itemName=Joruno-w.dependency-updater" target="__blank"><img src="https://img.shields.io/visual-studio-marketplace/v/Joruno-w.dependency-updater?color=c19999&amp;label=Marketplace&logo=visual-studio-code
+" alt="Visual Studio Marketplace Version" /></a>
+</p>
 
-## Installation
+## 安装步骤
+<p>请按照以下步骤安装插件：</p>
+<p>1. 在 VSCode 插件市场搜索 `dependency-updater` 并安装。</p>
+<p>2. 安装完成后，可以在侧边栏找到该插件。</p>
 
-1. Open VS Code
-2. Go to Extensions (Ctrl+Shift+X)
-3. Search for "B2C Auto Update"
-4. Click Install
+![安装步骤](./resources/install.gif)
 
-## Usage
+## 插件概览
 
-1. Open your B2C project in VS Code
-2. Use Command Palette (Ctrl+Shift+P)
-3. Type "B2C Auto Update" to access available commands
-4. Select the desired action
+<p align="center">
+<img width="344" alt="image" src="https://github.com/user-attachments/assets/415b1990-50ee-4356-b040-6ef9d1f0e142" />
+</p>
 
-## Commands
+## 功能演示
 
-- `B2C: Update Configuration`: Updates B2C configuration files
-- `B2C: Sync Changes`: Synchronizes recent changes
-- `B2C: Show Status`: Displays current sync status
+## 贡献
+欢迎贡献代码！请提交 Pull Request 或报告问题。
 
-## Configuration
-
-```json
-{
-  "b2c-auto-update.enabled": true,
-  "b2c-auto-update.autoSync": true
-}
-```
-
-## Requirements
-
-- Visual Studio Code 1.60.0 or higher
-- Active B2C project
-
-## Support
-
-For issues and feature requests, please visit the [GitHub repository](https://github.com/yourusername/b2c-auto-update).
-
-## License
-
-MIT
+## 许可证
+此项目使用 MIT 许可证。查看 [LICENSE](LICENSE) 文件以获取更多信息。
